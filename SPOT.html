@@ -15,10 +15,16 @@
       cursor: crosshair;
       margin-top: 10px;
     }
+    #timer {
+      font-size: 1.2em;
+      font-weight: bold;
+      margin: 10px 0;
+    }
   </style>
 </head>
 <body>
   <h1>Spot the Difference</h1>
+  <div id="timer">Time Left: <span id="time">60</span> seconds</div>
   <canvas id="gameCanvas" width="600" height="400"></canvas>
   <p>Differences Found: <span id="score">0</span>/5</p>
 
@@ -26,8 +32,12 @@
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
     const scoreDisplay = document.getElementById('score');
+    const timeDisplay = document.getElementById('time');
 
-    // Coordinates of difference spots (you can customize these)
+    const TIME_LIMIT = 60; // seconds
+    let timeLeft = TIME_LIMIT;
+    let timerInterval = null;
+
     const differences = [
       { x: 100, y: 80, radius: 20 },
       { x: 250, y: 150, radius: 20 },
@@ -37,14 +47,18 @@
     ];
 
     let found = [];
+    let gameOver = false;
 
     const image = new Image();
-    image.src = 'image.jpg'; // 🔁 Replace with your own image path
+    image.src = 'image.jpg'; // 🔁 Replace this with your image
     image.onload = () => {
       ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+      startTimer();
     };
 
     canvas.addEventListener('click', function(e) {
+      if (gameOver) return;
+
       const rect = canvas.getBoundingClientRect();
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
@@ -63,26 +77,40 @@
           scoreDisplay.textContent = found.length;
 
           if (found.length === differences.length) {
-            setTimeout(() => alert('🎉 Congratulations! You found all the differences!'), 100);
+            clearInterval(timerInterval);
+            gameOver = true;
+            setTimeout(() => alert('🎉 You found all the differences!'), 100);
           }
           break;
         }
       }
     });
 
-    // Draws a red ring (donut shape) at the given coordinates
     function drawRing(x, y) {
       const outerRadius = 25;
       const innerRadius = 10;
 
       ctx.save();
       ctx.beginPath();
-      ctx.arc(x, y, outerRadius, 0, Math.PI * 2, false); // Outer circle
-      ctx.arc(x, y, innerRadius, 0, Math.PI * 2, true);  // Inner circle (reverse direction)
+      ctx.arc(x, y, outerRadius, 0, Math.PI * 2, false);
+      ctx.arc(x, y, innerRadius, 0, Math.PI * 2, true);
       ctx.closePath();
       ctx.fillStyle = 'rgba(255, 0, 0, 0.6)';
       ctx.fill('evenodd');
       ctx.restore();
+    }
+
+    function startTimer() {
+      timerInterval = setInterval(() => {
+        timeLeft--;
+        timeDisplay.textContent = timeLeft;
+
+        if (timeLeft <= 0) {
+          clearInterval(timerInterval);
+          gameOver = true;
+          alert('⏰ Time\'s up! You found ' + found.length + ' out of ' + differences.length + ' differences.');
+        }
+      }, 1000);
     }
   </script>
 </body>
