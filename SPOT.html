@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Spot the Difference Game</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+    }
+
+    .game-container {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+    }
+
+    .image-container {
+      position: relative;
+      width: 400px;
+      height: auto;
+      display: inline-block;
+    }
+
+    .image-container img {
+      width: 100%;
+      border: 2px solid #444;
+    }
+
+    .click-spot {
+      position: absolute;
+      width: 30px;
+      height: 30px;
+      background-color: rgba(255, 0, 0, 0.4);
+      border-radius: 50%;
+      cursor: pointer;
+    }
+
+    .found {
+      background-color: rgba(0, 255, 0, 0.5) !important;
+    }
+
+    #status {
+      margin-top: 20px;
+      font-size: 18px;
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Spot the Difference</h1>
+  
+  <div class="game-container">
+    <div class="image-container" id="image1">
+      <img src="image1.jpg" alt="Original Image Placeholder" />
+      <div class="click-spot" data-id="1" style="top: 50px; left: 100px;"></div>
+      <div class="click-spot" data-id="2" style="top: 150px; left: 200px;"></div>
+    </div>
+
+    <div class="image-container" id="image2">
+      <img src="image2.jpg" alt="Edited Image Placeholder" />
+      <div class="click-spot" data-id="1" style="top: 50px; left: 100px;"></div>
+      <div class="click-spot" data-id="2" style="top: 150px; left: 200px;"></div>
+    </div>
+  </div>
+
+  <div id="status">Find all the differences!</div>
+
+  <script>
+    const totalDifferences = 2; // Update this if you add more
+    const found = new Set();
+
+    document.querySelectorAll('.click-spot').forEach(spot => {
+      spot.addEventListener('click', () => {
+        const id = spot.dataset.id;
+        if (!found.has(id)) {
+          found.add(id);
+          document.querySelectorAll(`[data-id="${id}"]`).forEach(el => {
+            el.classList.add('found');
+          });
+          updateStatus();
+        }
+      });
+    });
+
+    function updateStatus() {
+      const status = document.getElementById("status");
+      if (found.size === totalDifferences) {
+        status.textContent = "🎉 All differences found!";
+      } else {
+        status.textContent = `Found ${found.size} of ${totalDifferences} differences.`;
+      }
+    }
+  </script>
+
+</body>
+</html>
