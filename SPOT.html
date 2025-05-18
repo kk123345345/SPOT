@@ -1,106 +1,77 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Spot the Difference Game</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Spot the Difference</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f8f8f8;
-      text-align: center;
-      padding: 20px;
-    }
-
-    h1 {
-      margin-bottom: 20px;
-    }
-
-    .game-container {
-      display: flex;
-      justify-content: center;
-      gap: 20px;
-      margin-bottom: 20px;
-    }
-
-    .image-container {
-      position: relative;
-      width: 400px;
-      height: auto;
-    }
-
-    .image-container img {
-      width: 100%;
-      border: 2px solid #555;
-    }
-
-    .click-spot {
-      position: absolute;
-      width: 30px;
-      height: 30px;
-      border-radius: 50%;
-      background-color: rgba(255, 0, 0, 0.4);
-      cursor: pointer;
-    }
-
-    .click-spot.found {
-      background-color: rgba(0, 255, 0, 0.4);
-    }
-
-    #status {
-      font-size: 18px;
-      color: #333;
-    }
+    body { text-align: center; font-family: sans-serif; }
+    canvas { border: 2px solid #000; margin: 10px; cursor: crosshair; }
+    .container { display: flex; justify-content: center; }
   </style>
 </head>
 <body>
-
   <h1>Spot the Difference</h1>
-
-  <div class="game-container">
-    <div class="image-container" id="image1">
-      <img src="image1.jpg" alt="Original Image">
-      <!-- Example clickable areas -->
-      <div class="click-spot" data-id="1" style="top: 60px; left: 100px;"></div>
-      <div class="click-spot" data-id="2" style="top: 150px; left: 200px;"></div>
-    </div>
-
-    <div class="image-container" id="image2">
-      <img src="image2.jpg" alt="Edited Image">
-      <!-- Same clickable areas (mirrored) -->
-      <div class="click-spot" data-id="1" style="top: 60px; left: 100px;"></div>
-      <div class="click-spot" data-id="2" style="top: 150px; left: 200px;"></div>
-    </div>
+  <div class="container">
+    <canvas id="canvas1" width="400" height="300"></canvas>
+    <canvas id="canvas2" width="400" height="300"></canvas>
   </div>
-
-  <div id="status">Find all the differences!</div>
+  <p>Differences Found: <span id="score">0</span>/5</p>
 
   <script>
-    const totalDifferences = 2; // Update this as needed
-    const found = new Set();
+    const differences = [
+      { x: 120, y: 80, radius: 15 },
+      { x: 200, y: 130, radius: 20 },
+      { x: 300, y: 100, radius: 15 },
+      { x: 250, y: 200, radius: 10 },
+      { x: 150, y: 230, radius: 15 },
+    ];
+    let found = [];
 
-    document.querySelectorAll('.click-spot').forEach(spot => {
-      spot.addEventListener('click', () => {
-        const id = spot.dataset.id;
-        if (!found.has(id)) {
-          found.add(id);
-          // Mark both matching spots
-          document.querySelectorAll(`[data-id="${id}"]`).forEach(el => {
-            el.classList.add('found');
-          });
-          updateStatus();
+    const canvas1 = document.getElementById('canvas1');
+    const canvas2 = document.getElementById('canvas2');
+    const ctx1 = canvas1.getContext('2d');
+    const ctx2 = canvas2.getContext('2d');
+
+    // Replace with your actual image sources
+    const image1 = new Image();
+    const image2 = new Image();
+    image1.src = 'image1.jpg';
+    image2.src = 'image2.jpg';
+
+    image1.onload = () => ctx1.drawImage(image1, 0, 0, canvas1.width, canvas1.height);
+    image2.onload = () => ctx2.drawImage(image2, 0, 0, canvas2.width, canvas2.height);
+
+    function checkClick(e, canvas) {
+      const rect = canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
+      for (let i = 0; i < differences.length; i++) {
+        const diff = differences[i];
+        const dx = x - diff.x;
+        const dy = y - diff.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        if (distance < diff.radius && !found.includes(i)) {
+          found.push(i);
+          drawCircle(ctx1, diff.x, diff.y);
+          drawCircle(ctx2, diff.x, diff.y);
+          document.getElementById('score').innerText = found.length;
+          break;
         }
-      });
-    });
-
-    function updateStatus() {
-      const status = document.getElementById('status');
-      if (found.size === totalDifferences) {
-        status.textContent = "🎉 You found all the differences!";
-      } else {
-        status.textContent = `Found ${found.size} of ${totalDifferences} differences.`;
       }
     }
-  </script>
 
+    function drawCircle(ctx, x, y) {
+      ctx.beginPath();
+      ctx.arc(x, y, 20, 0, 2 * Math.PI);
+      ctx.strokeStyle = 'red';
+      ctx.lineWidth = 3;
+      ctx.stroke();
+    }
+
+    canvas1.addEventListener('click', e => checkClick(e, canvas1));
+    canvas2.addEventListener('click', e => checkClick(e, canvas2));
+  </script>
 </body>
 </html>
