@@ -26,15 +26,18 @@
       border: 3px solid #444;
     }
 
-    .spot {
-      position: absolute;
-      width: 30px;
-      height: 30px;
-      border-radius: 50%;
-      background-color: rgba(255, 0, 0, 0.4);
-      cursor: pointer;
-      transition: background-color 0.3s;
-    }
+   .spot {
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 3px solid red;
+  background-color: transparent; /* No fill */
+  cursor: pointer;
+  box-sizing: border-box;
+  transition: border-color 0.3s;
+}
+
 
     #status {
       margin-top: 20px;
@@ -84,14 +87,3 @@
 
 </body>
 </html>
-.spot {
-  position: absolute;
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  border: 3px solid red;
-  background-color: transparent; /* No fill */
-  cursor: pointer;
-  box-sizing: border-box;
-  transition: border-color 0.3s;
-}
