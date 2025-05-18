@@ -26,18 +26,18 @@
       border: 3px solid #444;
     }
 
-   .spot {
-  position: absolute;
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  border: 3px solid red;
-  background-color: transparent; /* No fill */
-  cursor: pointer;
-  box-sizing: border-box;
-  transition: border-color 0.3s;
-}
-
+    .spot {
+      position: absolute;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      border: 3px solid red;
+      background-color: transparent; /* No fill */
+      cursor: pointer;
+      box-sizing: border-box;
+      transition: opacity 0.3s;
+      display: none; /* Hide initially */
+    }
 
     #status {
       margin-top: 20px;
@@ -69,8 +69,9 @@
 
     document.querySelectorAll('.spot').forEach(spot => {
       spot.addEventListener('click', function () {
+        // Display the red ring only after the click
         if (this.dataset.found === "false") {
-          this.style.backgroundColor = "rgba(0, 255, 0, 0.6)";
+          this.style.display = 'block'; // Show the ring after clicking
           this.dataset.found = "true";
           foundCount++;
           statusText.textContent = `Differences found: ${foundCount}`;
@@ -83,6 +84,13 @@
         }
       });
     });
+
+    // Initially show the clickable spots
+    window.onload = () => {
+      document.querySelectorAll('.spot').forEach(spot => {
+        spot.style.display = 'block'; // Make spots visible
+      });
+    };
   </script>
 
 </body>
