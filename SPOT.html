@@ -1,86 +1,74 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Overlay Images Example</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Spot the Difference</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      background-color: #f4f4f4;
-    }
-
-    .container {
-      position: relative;
-      width: 800px; /* Set this to your background image width */
-      margin: 20px auto;
-    }
-
-    .background {
-      width: 100%;
-      display: block;
-    }
-
-    .overlay {
-      position: absolute;
-      width: 50px; /* Or whatever size suits your item */
-      cursor: pointer;
-      transition: transform 0.2s ease;
-    }
-
-    .overlay.found {
-      filter: grayscale(100%) opacity(0.5);
-      transform: scale(1.2);
-    }
-
-    #status {
-      font-size: 18px;
-      margin-top: 20px;
-    }
+    body { text-align: center; font-family: sans-serif; }
+    canvas { border: 2px solid #000; cursor: crosshair; margin-top: 10px; }
   </style>
 </head>
 <body>
-
-  <h1>Spot the Items That Don't Belong</h1>
-
-  <div class="container">
-    <!-- Main background image -->
-    <img src="scene.jpg" class="background" alt="Scene">
-
-    <!-- Overlay images (placed manually using top & left) -->
-    <img src="item1.png" class="overlay" data-id="1" style="top: 100px; left: 200px;">
-    <img src="item2.png" class="overlay" data-id="2" style="top: 180px; left: 400px;">
-    <img src="item3.png" class="overlay" data-id="3" style="top: 300px; left: 250px;">
-  </div>
-
-  <div id="status">Find all 3 out-of-era items!</div>
+  <h1>Spot the Difference</h1>
+  <canvas id="gameCanvas" width="600" height="400"></canvas>
+  <p>Differences Found: <span id="score">0</span>/5</p>
 
   <script>
-    const totalItems = 3;
-    const foundItems = new Set();
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const scoreDisplay = document.getElementById('score');
 
-    document.querySelectorAll('.overlay').forEach(item => {
-      item.addEventListener('click', () => {
-        const id = item.dataset.id;
-        if (!foundItems.has(id)) {
-          foundItems.add(id);
-          document.querySelectorAll(`[data-id="${id}"]`).forEach(el => {
-            el.classList.add('found');
-          });
-          updateStatus();
+    // Difference spots (coordinates and radius)
+    const differences = [
+      { x: 100, y: 80, radius: 20 },
+      { x: 250, y: 150, radius: 20 },
+      { x: 400, y: 90, radius: 20 },
+      { x: 300, y: 250, radius: 20 },
+      { x: 150, y: 300, radius: 20 },
+    ];
+
+    let found = [];
+
+    const image = new Image();
+    image.src = 'image.jpg'; // Replace with your image
+    image.onload = () => {
+      ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+    };
+
+    canvas.addEventListener('click', function(e) {
+      const rect = canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
+      for (let i = 0; i < differences.length; i++) {
+        if (found.includes(i)) continue;
+
+        const diff = differences[i];
+        const dx = x - diff.x;
+        const dy = y - diff.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+
+        if (distance < diff.radius) {
+          found.push(i);
+          drawCircle(diff.x, diff.y);
+          scoreDisplay.textContent = found.length;
+
+          if (found.length === differences.length) {
+            alert('Congratulations! You found all the differences!');
+          }
+          break;
         }
-      });
+      }
     });
 
-    function updateStatus() {
-      const status = document.getElementById('status');
-      if (foundItems.size === totalItems) {
-        status.textContent = "🎉 All modern items found!";
-      } else {
-        status.textContent = `Found ${foundItems.size} of ${totalItems} items.`;
-      }
+    function drawCircle(x, y) {
+      ctx.beginPath();
+      ctx.arc(x, y, 25, 0, Math.PI * 2);
+      ctx.strokeStyle = 'red';
+      ctx.lineWidth = 3;
+      ctx.stroke();
     }
   </script>
-
 </body>
 </html>
