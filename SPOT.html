@@ -32,11 +32,17 @@
       height: 30px;
       border-radius: 50%;
       border: 3px solid red;
-      background-color: transparent; /* No fill */
+      background-color: transparent;
       cursor: pointer;
       box-sizing: border-box;
+      display: block; /* Keep clickable */
+      opacity: 0; /* Invisible at first */
+      pointer-events: auto; /* Still clickable */
       transition: opacity 0.3s;
-      display: none; /* Hide initially */
+    }
+
+    .spot.found {
+      opacity: 1; /* Show red ring */
     }
 
     #status {
@@ -53,8 +59,8 @@
 
   <div class="image-container">
     <img src="scene.jpg" alt="Spot the Difference Scene" class="game-image">
-    
-    <!-- Example clickable difference spots -->
+
+    <!-- Clickable difference spots (start hidden, appear as red ring when found) -->
     <div class="spot" style="top: 80px; left: 150px;" data-found="false"></div>
     <div class="spot" style="top: 220px; left: 320px;" data-found="false"></div>
     <div class="spot" style="top: 300px; left: 480px;" data-found="false"></div>
@@ -69,9 +75,8 @@
 
     document.querySelectorAll('.spot').forEach(spot => {
       spot.addEventListener('click', function () {
-        // Display the red ring only after the click
         if (this.dataset.found === "false") {
-          this.style.display = 'block'; // Show the ring after clicking
+          this.classList.add('found'); // Show the red ring by changing opacity
           this.dataset.found = "true";
           foundCount++;
           statusText.textContent = `Differences found: ${foundCount}`;
@@ -84,13 +89,6 @@
         }
       });
     });
-
-    // Initially show the clickable spots
-    window.onload = () => {
-      document.querySelectorAll('.spot').forEach(spot => {
-        spot.style.display = 'block'; // Make spots visible
-      });
-    };
   </script>
 
 </body>
