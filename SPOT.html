@@ -1,117 +1,102 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
   <title>Spot the Difference</title>
   <style>
     body {
+      font-family: Arial, sans-serif;
       text-align: center;
-      font-family: sans-serif;
-      background-color: #f4f4f4;
+      background-color: #f9f9f9;
+      margin: 0;
+      padding: 20px;
     }
-    canvas {
-      border: 2px solid #000;
-      cursor: crosshair;
-      margin-top: 10px;
+
+    h1 {
+      color: #333;
     }
-    #timer {
-      font-size: 1.2em;
+
+    .game-container {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-top: 20px;
+      position: relative;
+    }
+
+    .image-container {
+      position: relative;
+    }
+
+    .game-image {
+      width: 400px;
+      height: auto;
+      border: 2px solid #333;
+    }
+
+    .spot {
+      position: absolute;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background-color: rgba(255, 0, 0, 0.4);
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    #status {
+      margin-top: 20px;
       font-weight: bold;
-      margin: 10px 0;
+      font-size: 18px;
     }
   </style>
 </head>
 <body>
+
   <h1>Spot the Difference</h1>
-  <div id="timer">Time Left: <span id="time">60</span> seconds</div>
-  <canvas id="gameCanvas" width="600" height="400"></canvas>
-  <p>Differences Found: <span id="score">0</span>/5</p>
+  <p>Click all the differences!</p>
+
+  <div class="game-container">
+    <!-- First image with difference spots -->
+    <div class="image-container">
+      <img src="image1.jpg" alt="Image 1" class="game-image">
+      <!-- Example spots -->
+      <div class="spot" style="top: 60px; left: 100px;" data-found="false"></div>
+      <div class="spot" style="top: 130px; left: 220px;" data-found="false"></div>
+      <!-- Add more spots if needed -->
+    </div>
+
+    <!-- Second image for comparison -->
+    <div class="image-container">
+      <img src="image2.jpg" alt="Image 2" class="game-image">
+    </div>
+  </div>
+
+  <p id="status">Differences found: 0</p>
 
   <script>
-    const canvas = document.getElementById('gameCanvas');
-    const ctx = canvas.getContext('2d');
-    const scoreDisplay = document.getElementById('score');
-    const timeDisplay = document.getElementById('time');
+    let foundCount = 0;
+    const totalDifferences = document.querySelectorAll('.spot').length;
+    const statusText = document.getElementById('status');
 
-    const TIME_LIMIT = 60; // seconds
-    let timeLeft = TIME_LIMIT;
-    let timerInterval = null;
+    document.querySelectorAll('.spot').forEach(spot => {
+      spot.addEventListener('click', function () {
+        if (this.dataset.found === "false") {
+          this.style.backgroundColor = "rgba(0, 255, 0, 0.6)";
+          this.dataset.found = "true";
+          foundCount++;
+          statusText.textContent = `Differences found: ${foundCount}`;
 
-    const differences = [
-      { x: 100, y: 80, radius: 20 },
-      { x: 250, y: 150, radius: 20 },
-      { x: 400, y: 90, radius: 20 },
-      { x: 300, y: 250, radius: 20 },
-      { x: 150, y: 300, radius: 20 },
-    ];
-
-    let found = [];
-    let gameOver = false;
-
-    const image = new Image();
-    image.src = 'image.jpg'; // 🔁 Replace this with your image
-    image.onload = () => {
-      ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
-      startTimer();
-    };
-
-    canvas.addEventListener('click', function(e) {
-      if (gameOver) return;
-
-      const rect = canvas.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-
-      for (let i = 0; i < differences.length; i++) {
-        if (found.includes(i)) continue;
-
-        const diff = differences[i];
-        const dx = x - diff.x;
-        const dy = y - diff.y;
-        const distance = Math.sqrt(dx * dx + dy * dy);
-
-        if (distance < diff.radius) {
-          found.push(i);
-          drawRing(diff.x, diff.y);
-          scoreDisplay.textContent = found.length;
-
-          if (found.length === differences.length) {
-            clearInterval(timerInterval);
-            gameOver = true;
-            setTimeout(() => alert('🎉 You found all the differences!'), 100);
+          if (foundCount === totalDifferences) {
+            setTimeout(() => {
+              alert("🎉 Congratulations! You found all the differences!");
+            }, 200);
           }
-          break;
         }
-      }
+      });
     });
-
-    function drawRing(x, y) {
-      const outerRadius = 25;
-      const innerRadius = 10;
-
-      ctx.save();
-      ctx.beginPath();
-      ctx.arc(x, y, outerRadius, 0, Math.PI * 2, false);
-      ctx.arc(x, y, innerRadius, 0, Math.PI * 2, true);
-      ctx.closePath();
-      ctx.fillStyle = 'rgba(255, 0, 0, 0.6)';
-      ctx.fill('evenodd');
-      ctx.restore();
-    }
-
-    function startTimer() {
-      timerInterval = setInterval(() => {
-        timeLeft--;
-        timeDisplay.textContent = timeLeft;
-
-        if (timeLeft <= 0) {
-          clearInterval(timerInterval);
-          gameOver = true;
-          alert('⏰ Time\'s up! You found ' + found.length + ' out of ' + differences.length + ' differences.');
-        }
-      }, 1000);
-    }
   </script>
+
 </body>
 </html>
+
