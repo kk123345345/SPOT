@@ -4,26 +4,34 @@
   const statusText = document.getElementById('status');
   const timerDisplay = document.getElementById('timer');
 
-  // Countdown Timer - 3 minutes = 180 seconds
+  // Set countdown time (3 minutes = 180 seconds)
   let timeLeft = 180;
-  const timer = setInterval(() => {
-    let minutes = Math.floor(timeLeft / 60);
-    let seconds = timeLeft % 60;
-    timerDisplay.textContent = `Time left: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
-    timeLeft--;
 
-    // Time's up
+  // Display initial time
+  function updateTimerDisplay() {
+    const minutes = Math.floor(timeLeft / 60);
+    const seconds = timeLeft % 60;
+    timerDisplay.textContent = `Time left: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+  }
+
+  updateTimerDisplay();
+
+  // Countdown timer
+  const timer = setInterval(() => {
+    timeLeft--;
+    updateTimerDisplay();
+
     if (timeLeft < 0) {
       clearInterval(timer);
       alert("⏰ Time's up! Try again.");
-      // Optional: Disable further clicks
+      // Optionally disable further clicking:
       document.querySelectorAll('.spot').forEach(spot => {
         spot.style.pointerEvents = 'none';
       });
     }
   }, 1000);
 
-  // Spot click logic
+  // Handle clicks on difference spots
   document.querySelectorAll('.spot').forEach(spot => {
     spot.addEventListener('click', function () {
       if (this.dataset.found === "false") {
@@ -33,9 +41,9 @@
         statusText.textContent = `Differences found: ${foundCount}`;
 
         if (foundCount === totalDifferences) {
-          clearInterval(timer);
+          clearInterval(timer); // Stop timer
           setTimeout(() => {
-            alert(`🎉 Well done! You found all the differences with ${timeLeft + 1} seconds left!`);
+            alert(`🎉 Well done! You found all the differences with ${timeLeft} seconds left!`);
           }, 200);
         }
       }
