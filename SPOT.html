@@ -35,20 +35,26 @@
       background-color: transparent;
       cursor: pointer;
       box-sizing: border-box;
-      display: block; /* Keep clickable */
-      opacity: 0; /* Invisible at first */
-      pointer-events: auto; /* Still clickable */
+      display: block;
+      opacity: 0;
+      pointer-events: auto;
       transition: opacity 0.3s;
     }
 
     .spot.found {
-      opacity: 1; /* Show red ring */
+      opacity: 1;
     }
 
     #status {
       margin-top: 20px;
       font-weight: bold;
       font-size: 18px;
+    }
+
+    #timer {
+      font-size: 18px;
+      margin-top: 10px;
+      color: #555;
     }
   </style>
 </head>
@@ -60,30 +66,41 @@
   <div class="image-container">
     <img src="scene.jpg" alt="Spot the Difference Scene" class="game-image">
 
-    <!-- Clickable difference spots (start hidden, appear as red ring when found) -->
+    <!-- Clickable difference spots -->
     <div class="spot" style="top: 80px; left: 150px;" data-found="false"></div>
     <div class="spot" style="top: 220px; left: 320px;" data-found="false"></div>
     <div class="spot" style="top: 300px; left: 480px;" data-found="false"></div>
   </div>
 
   <p id="status">Differences found: 0</p>
+  <p id="timer">Time: 0s</p>
 
   <script>
     let foundCount = 0;
     const totalDifferences = document.querySelectorAll('.spot').length;
     const statusText = document.getElementById('status');
+    const timerDisplay = document.getElementById('timer');
 
+    // Timer logic
+    let time = 0;
+    const timer = setInterval(() => {
+      time++;
+      timerDisplay.textContent = `Time: ${time}s`;
+    }, 1000);
+
+    // Spot click handler
     document.querySelectorAll('.spot').forEach(spot => {
       spot.addEventListener('click', function () {
         if (this.dataset.found === "false") {
-          this.classList.add('found'); // Show the red ring by changing opacity
+          this.classList.add('found');
           this.dataset.found = "true";
           foundCount++;
           statusText.textContent = `Differences found: ${foundCount}`;
 
           if (foundCount === totalDifferences) {
+            clearInterval(timer); // Stop timer
             setTimeout(() => {
-              alert("🎉 Well done! You found all the differences!");
+              alert(`🎉 Well done! You found all the differences in ${time} seconds!`);
             }, 200);
           }
         }
