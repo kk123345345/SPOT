@@ -66,11 +66,11 @@
   <div class="image-container">
     <img src="scene.jpg" alt="Spot the Difference Scene" class="game-image">
 
-    <!-- Clickable difference spots -->
-    <div class="spot" style="top: 125px; left: 180px;" data-found="false"></div>
-    <div class="spot" style="top: 125px; left: 330px;" data-found="false"></div>
-    <div class="spot" style="top: 180px; left: 530px;" data-found="false"></div>
-    <div class="spot" style="top: 180px; left: 15px;" data-found="false"></div>
+    <!-- Clickable difference spots with messages -->
+    <div class="spot" style="top: 125px; left: 180px;" data-found="false" data-message="You found the first difference!"></div>
+    <div class="spot" style="top: 125px; left: 330px;" data-found="false" data-message="Good eye! Another difference found."></div>
+    <div class="spot" style="top: 180px; left: 530px;" data-found="false" data-message="Nice! You're getting them all."></div>
+    <div class="spot" style="top: 180px; left: 15px;" data-found="false" data-message="Well spotted! Last one?"></div>
   </div>
 
   <p id="status">Differences found: 0</p>
@@ -116,11 +116,29 @@
           foundCount++;
           statusText.textContent = `Differences found: ${foundCount}`;
 
+          // Show the message from data-message
+          const prompt = document.createElement('div');
+          prompt.textContent = this.dataset.message || "✔️ Difference found!";
+          prompt.style.position = 'absolute';
+          prompt.style.top = `${this.offsetTop - 30}px`; // above the circle
+          prompt.style.left = `${this.offsetLeft + 40}px`;
+          prompt.style.backgroundColor = 'rgba(255,255,255,0.95)';
+          prompt.style.border = '1px solid #999';
+          prompt.style.padding = '5px 10px';
+          prompt.style.borderRadius = '5px';
+          prompt.style.fontSize = '14px';
+          prompt.style.color = '#333';
+          prompt.style.boxShadow = '0 2px 6px rgba(0, 0, 0, 0.2)';
+          prompt.style.zIndex = '100';
+
+          document.querySelector('.image-container').appendChild(prompt);
+          setTimeout(() => prompt.remove(), 2000);
+
           if (foundCount === totalDifferences) {
             clearInterval(timer);
             setTimeout(() => {
               alert(`🎉 Well done! You found all the differences with ${timeLeft} seconds left!`);
-            }, 200);
+            }, 300);
           }
         }
       });
