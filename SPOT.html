@@ -1,112 +1,44 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Spot the Difference</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      background-color: #f0f0f0;
-      padding: 20px;
-    }
+<script>
+  let foundCount = 0;
+  const totalDifferences = document.querySelectorAll('.spot').length;
+  const statusText = document.getElementById('status');
+  const timerDisplay = document.getElementById('timer');
 
-    h1 {
-      color: #333;
-    }
+  // Countdown Timer - 3 minutes = 180 seconds
+  let timeLeft = 180;
+  const timer = setInterval(() => {
+    let minutes = Math.floor(timeLeft / 60);
+    let seconds = timeLeft % 60;
+    timerDisplay.textContent = `Time left: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+    timeLeft--;
 
-    .image-container {
-      position: relative;
-      display: inline-block;
-    }
-
-    .game-image {
-      width: 600px;
-      height: auto;
-      border: 3px solid #444;
-    }
-
-    .spot {
-      position: absolute;
-      width: 30px;
-      height: 30px;
-      border-radius: 50%;
-      border: 3px solid red;
-      background-color: transparent;
-      cursor: pointer;
-      box-sizing: border-box;
-      display: block;
-      opacity: 0;
-      pointer-events: auto;
-      transition: opacity 0.3s;
-    }
-
-    .spot.found {
-      opacity: 1;
-    }
-
-    #status {
-      margin-top: 20px;
-      font-weight: bold;
-      font-size: 18px;
-    }
-
-    #timer {
-      font-size: 18px;
-      margin-top: 10px;
-      color: #555;
-    }
-  </style>
-</head>
-<body>
-
-  <h1>Spot the Difference</h1>
-  <p>Click all the hidden differences in the image!</p>
-
-  <div class="image-container">
-    <img src="scene.jpg" alt="Spot the Difference Scene" class="game-image">
-
-    <!-- Clickable difference spots -->
-    <div class="spot" style="top: 80px; left: 150px;" data-found="false"></div>
-    <div class="spot" style="top: 220px; left: 320px;" data-found="false"></div>
-    <div class="spot" style="top: 300px; left: 480px;" data-found="false"></div>
-  </div>
-
-  <p id="status">Differences found: 0</p>
-  <p id="timer">Time: 0s</p>
-
-  <script>
-    let foundCount = 0;
-    const totalDifferences = document.querySelectorAll('.spot').length;
-    const statusText = document.getElementById('status');
-    const timerDisplay = document.getElementById('timer');
-
-    // Timer logic
-    let time = 0;
-    const timer = setInterval(() => {
-      time++;
-      timerDisplay.textContent = `Time: ${time}s`;
-    }, 1000);
-
-    // Spot click handler
-    document.querySelectorAll('.spot').forEach(spot => {
-      spot.addEventListener('click', function () {
-        if (this.dataset.found === "false") {
-          this.classList.add('found');
-          this.dataset.found = "true";
-          foundCount++;
-          statusText.textContent = `Differences found: ${foundCount}`;
-
-          if (foundCount === totalDifferences) {
-            clearInterval(timer); // Stop timer
-            setTimeout(() => {
-              alert(`🎉 Well done! You found all the differences in ${time} seconds!`);
-            }, 200);
-          }
-        }
+    // Time's up
+    if (timeLeft < 0) {
+      clearInterval(timer);
+      alert("⏰ Time's up! Try again.");
+      // Optional: Disable further clicks
+      document.querySelectorAll('.spot').forEach(spot => {
+        spot.style.pointerEvents = 'none';
       });
-    });
-  </script>
+    }
+  }, 1000);
 
-</body>
-</html>
+  // Spot click logic
+  document.querySelectorAll('.spot').forEach(spot => {
+    spot.addEventListener('click', function () {
+      if (this.dataset.found === "false") {
+        this.classList.add('found');
+        this.dataset.found = "true";
+        foundCount++;
+        statusText.textContent = `Differences found: ${foundCount}`;
+
+        if (foundCount === totalDifferences) {
+          clearInterval(timer);
+          setTimeout(() => {
+            alert(`🎉 Well done! You found all the differences with ${timeLeft + 1} seconds left!`);
+          }, 200);
+        }
+      }
+    });
+  });
+</script>
