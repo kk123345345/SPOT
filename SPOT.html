@@ -2,147 +2,37 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Spot the Difference</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      background-color: #f0f0f0;
-      padding: 20px;
-    }
-
-    h1 {
-      color: #333;
-    }
-
-    .image-container {
-      position: relative;
-      display: inline-block;
-    }
-
-    .game-image {
-      width: 600px;
-      height: auto;
-      border: 3px solid #444;
-    }
-
-    .spot {
-      position: absolute;
-      width: 30px;
-      height: 30px;
-      border-radius: 50%;
-      border: 3px solid red;
-      background-color: transparent;
-      cursor: pointer;
-      box-sizing: border-box;
-      display: block;
-      opacity: 0;
-      pointer-events: auto;
-      transition: opacity 0.3s;
-    }
-
-    .spot.found {
-      opacity: 1;
-    }
-
-    #status {
-      margin-top: 20px;
-      font-weight: bold;
-      font-size: 18px;
-    }
-
-    #timer {
-      font-size: 18px;
-      margin-top: 10px;
-      color: #555;
-    }
-  </style>
+  <title>Upload and Display Image</title>
 </head>
 <body>
 
-  <h1>Spot the Difference</h1>
-  <p>Click all the hidden differences in the image!</p>
+  <h2>Select an Image to Display</h2>
 
-  <div class="image-container">
-    <img src="scene.jpg" alt="Spot the Difference Scene" class="game-image">
+  <!-- Image upload input -->
+  <input type="file" id="imageInput" accept="image/*">
 
-    <!-- Clickable difference spots with messages -->
-    <div class="spot" style="top: 125px; left: 180px;" data-found="false" data-message="NEWater in Singapore is a high-grade reclaimed water source, produced from treated wastewater using advanced membrane technologies. It's a key component of Singapore's water supply, contributing significantly to water security and sustainability. 
-!"></div>
-    <div class="spot" style="top: 125px; left: 330px;" data-found="false" data-message=" a digital system implemented by the Government of Singapore to facilitate contact tracing efforts in response to the COVID-19 pandemic in Singapore."></div>
-    <div class="spot" style="top: 180px; left: 530px;" data-found="false" data-message="KOI Thé entered the Singaporean market in 2007."></div>
-    <div class="spot" style="top: 180px; left: 15px;" data-found="false" data-message="Grab played a vital role in supporting people and businesses during the pandemic by enabling essential services and providing new earning opportunities."></div>
-  </div>
+  <br><br>
 
-  <p id="status">Differences found: 0</p>
-  <p id="timer">Time left: 3:00</p>
+  <!-- Where the image will appear -->
+  <img id="preview" src="" alt="Image Preview" style="max-width: 500px; display: none;">
 
   <script>
-    let foundCount = 0;
-    const totalDifferences = document.querySelectorAll('.spot').length;
-    const statusText = document.getElementById('status');
-    const timerDisplay = document.getElementById('timer');
+    const imageInput = document.getElementById('imageInput');
+    const preview = document.getElementById('preview');
 
-    // Countdown start time: 3 minutes (180 seconds)
-    let timeLeft = 180;
+    imageInput.addEventListener('change', function() {
+      const file = this.files[0];
 
-    function updateTimerDisplay() {
-      const minutes = Math.floor(timeLeft / 60);
-      const seconds = timeLeft % 60;
-      timerDisplay.textContent = `Time left: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
-    }
+      if (file) {
+        const reader = new FileReader();
 
-    updateTimerDisplay(); // Initial display
-
-    const timer = setInterval(() => {
-      timeLeft--;
-      updateTimerDisplay();
-
-      if (timeLeft < 0) {
-        clearInterval(timer);
-        alert("⏰ Time's up! Try again.");
-        // Disable all clickable spots
-        document.querySelectorAll('.spot').forEach(spot => {
-          spot.style.pointerEvents = 'none';
-        });
-      }
-    }, 1000);
-
-    // Spot click logic
-    document.querySelectorAll('.spot').forEach(spot => {
-      spot.addEventListener('click', function () {
-        if (this.dataset.found === "false") {
-          this.classList.add('found');
-          this.dataset.found = "true";
-          foundCount++;
-          statusText.textContent = `Differences found: ${foundCount}`;
-
-          // Show the message from data-message
-          const prompt = document.createElement('div');
-          prompt.textContent = this.dataset.message || "✔️ Difference found!";
-          prompt.style.position = 'absolute';
-          prompt.style.top = `${this.offsetTop - 30}px`; // above the circle
-          prompt.style.left = `${this.offsetLeft + 40}px`;
-          prompt.style.backgroundColor = 'rgba(255,255,255,0.95)';
-          prompt.style.border = '1px solid #999';
-          prompt.style.padding = '5px 10px';
-          prompt.style.borderRadius = '5px';
-          prompt.style.fontSize = '14px';
-          prompt.style.color = '#333';
-          prompt.style.boxShadow = '0 2px 6px rgba(0, 0, 0, 0.2)';
-          prompt.style.zIndex = '100';
-
-          document.querySelector('.image-container').appendChild(prompt);
-          setTimeout(() => prompt.remove(), 2000);
-
-          if (foundCount === totalDifferences) {
-            clearInterval(timer);
-            setTimeout(() => {
-              alert(`🎉 Well done! You found all the differences with ${timeLeft} seconds left!`);
-            }, 300);
-          }
+        reader.onload = function(e) {
+          preview.src = e.target.result;
+          preview.style.display = 'block';
         }
-      });
+
+        reader.readAsDataURL(file);
+      }
     });
   </script>
 
